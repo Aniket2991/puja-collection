@@ -1,0 +1,2 @@
+import {NextResponse} from "next/server";import {setSession,validPassword} from "@/lib/auth";
+export async function POST(req:Request){const x=await req.json().catch(()=>({}));if(typeof x.password!=="string"||!validPassword(x.password))return NextResponse.json({error:"Invalid password"},{status:401});await setSession();return NextResponse.json({ok:true})}
