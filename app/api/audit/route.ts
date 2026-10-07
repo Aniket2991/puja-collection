@@ -1,0 +1,2 @@
+import {NextResponse} from "next/server";import {db,ensureSchema} from "../../../lib/db";import {isAuthenticated} from "../../../lib/auth";
+export async function GET(){if(!(await isAuthenticated()))return NextResponse.json({error:"Unauthorized"},{status:401});await ensureSchema();const rows=await db().unsafe("SELECT id,record_id AS \"recordId\",action,created_at AS \"createdAt\" FROM collection_audit ORDER BY created_at DESC LIMIT 100");return NextResponse.json(rows)}
