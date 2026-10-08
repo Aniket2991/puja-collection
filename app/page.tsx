@@ -2,7 +2,8 @@
 import {useEffect,useMemo,useState} from "react";
 type Rec={id:string,name:string,mobile:string,amount:string|number,mode:"UPI"|"Cash"|"Bank",utr:string,date:string,receivedBy:string,purpose:string,notes:string};
 const money=(n:number)=>new Intl.NumberFormat("en-IN",{style:"currency",currency:"INR",maximumFractionDigits:2}).format(n);
-const indiaDate=()=>new Intl.DateTimeFormat("en-CA",{timeZone:"Asia/Kolkata",year:"numeric",month:"2-digit",day:"2-digit"}).format(new Date());\nconst indiaMonth=()=>indiaDate().slice(0,7);
+const indiaDate=()=>new Intl.DateTimeFormat("en-CA",{timeZone:"Asia/Kolkata",year:"numeric",month:"2-digit",day:"2-digit"}).format(new Date());
+const indiaMonth=()=>indiaDate().slice(0,7);
 const mask=(v:string)=>v?v.length>4?"••••"+v.slice(-4):"••••":"—";
 export default function Home(){
  const[records,setRecords]=useState<Rec[]>([]),[q,setQ]=useState(""),[dateFrom,setDateFrom]=useState(""),[dateTo,setDateTo]=useState(""),[modeFilter,setModeFilter]=useState("All"),[purposeFilter,setPurposeFilter]=useState("All"),[loading,setLoading]=useState(true),[error,setError]=useState(""),[shared,setShared]=useState(false),[ready,setReady]=useState(false),[lastUpdated,setLastUpdated]=useState("");
