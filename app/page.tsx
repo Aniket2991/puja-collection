@@ -1,7 +1,7 @@
 "use client";
 import {useEffect,useMemo,useState} from "react";
 type Rec={id:string,name:string,mobile:string,amount:string|number,mode:"UPI"|"Cash"|"Bank",utr:string,date:string,receivedBy:string,purpose:string,notes:string};
-const money=(n:number)=>new Intl.NumberFormat("en-IN",{style:"currency",currency:"INR",maximumFractionDigits:2}).format(n);
+const money=(n:number)=>new Intl.NumberFormat("en-IN",{style:"currency",currency:"INR",maximumFractionDigits:2}).format(n);\nconst indiaDate=()=>new Intl.DateTimeFormat("en-CA",{timeZone:"Asia/Kolkata",year:"numeric",month:"2-digit",day:"2-digit"}).format(new Date());\nconst indiaMonth=()=>indiaDate().slice(0,7);
 const mask=(v:string)=>v?v.length>4?"••••"+v.slice(-4):"••••":"—";
 export default function Home(){
  const[records,setRecords]=useState<Rec[]>([]),[q,setQ]=useState(""),[dateFrom,setDateFrom]=useState(""),[dateTo,setDateTo]=useState(""),[modeFilter,setModeFilter]=useState("All"),[purposeFilter,setPurposeFilter]=useState("All"),[loading,setLoading]=useState(true),[error,setError]=useState(""),[shared,setShared]=useState(false),[ready,setReady]=useState(false),[lastUpdated,setLastUpdated]=useState("");
@@ -10,23 +10,23 @@ export default function Home(){
  useEffect(()=>{load()},[q]);
  useEffect(()=>{if(!ready)return;const p=new URLSearchParams();if(q)p.set("q",q);if(dateFrom)p.set("from",dateFrom);if(dateTo)p.set("to",dateTo);if(modeFilter!=="All")p.set("mode",modeFilter);if(purposeFilter!=="All")p.set("type",purposeFilter);const next=p.toString()?location.pathname+"?"+p.toString():location.pathname;history.replaceState(null,"",next)},[ready,q,dateFrom,dateTo,modeFilter,purposeFilter]);
  const filtered=useMemo(()=>records.filter(r=>(!dateFrom||r.date>=dateFrom)&&(!dateTo||r.date<=dateTo)&&(modeFilter==="All"||r.mode===modeFilter)&&(purposeFilter==="All"||r.purpose===purposeFilter)),[records,dateFrom,dateTo,modeFilter,purposeFilter]);
- const total=filtered.reduce((a,r)=>a+Number(r.amount),0),today=filtered.filter(r=>r.date===new Date().toISOString().slice(0,10)).reduce((a,r)=>a+Number(r.amount),0);
+ const total=filtered.reduce((a,r)=>a+Number(r.amount),0),today=filtered.filter(r=>r.date===indiaDate()).reduce((a,r)=>a+Number(r.amount),0);
  const by=(m:string)=>filtered.filter(r=>r.mode===m).reduce((a,r)=>a+Number(r.amount),0);
  const contributors=useMemo(()=>{const m=new Map<string,number>();filtered.forEach(r=>{const n=r.name?.trim()||"Anonymous";m.set(n,(m.get(n)||0)+Number(r.amount))});return [...m.entries()].sort((a,b)=>b[1]-a[1]).slice(0,5)},[filtered]);
  const timeline=useMemo(()=>{const m=new Map<string,number>();filtered.forEach(r=>m.set(r.date,(m.get(r.date)||0)+Number(r.amount)));return [...m.entries()].sort((a,b)=>a[0].localeCompare(b[0])).slice(-7)},[filtered]);
  const maxDay=Math.max(...timeline.map(x=>x[1]),1);
- const currentMonth=new Date().toISOString().slice(0,7),[selectedMonth,setSelectedMonth]=useState(currentMonth);
+ const[selectedMonth,setSelectedMonth]=useState(indiaMonth());
  const monthRecords=useMemo(()=>records.filter(r=>r.date.slice(0,7)===selectedMonth),[records,selectedMonth]);
  const monthTotal=monthRecords.reduce((a,r)=>a+Number(r.amount),0);
  const monthBy=(m:string)=>monthRecords.filter(r=>r.mode===m).reduce((a,r)=>a+Number(r.amount),0);
  const monthByType=(p:string)=>monthRecords.filter(r=>(r.purpose||"Other")===p).reduce((a,r)=>a+Number(r.amount),0);
- const previousMonth=useMemo(()=>{const d=new Date(selectedMonth+"-01T00:00:00");d.setMonth(d.getMonth()-1);return d.toISOString().slice(0,7)},[selectedMonth]);
+ const previousMonth=useMemo(()=>{const [y,m]=selectedMonth.split("-").map(Number);const d=new Date(Date.UTC(y,m-2,1));return d.toISOString().slice(0,7)},[selectedMonth]);
  const previousMonthTotal=useMemo(()=>records.filter(r=>r.date.slice(0,7)===previousMonth).reduce((a,r)=>a+Number(r.amount),0),[records,previousMonth]);
  const monthChange=previousMonthTotal?((monthTotal-previousMonthTotal)/previousMonthTotal*100):null;
  const monthAverage=monthRecords.length?monthTotal/monthRecords.length:0;
  const largestContribution=monthRecords.length?Math.max(...monthRecords.map(r=>Number(r.amount))):0;
  const uniqueContributors=new Set(monthRecords.map(r=>r.name?.trim()||"Anonymous")).size;
- function csv(){const esc=(x:any)=>JSON.stringify(String(x??"")),head=["Date","Contributor","Amount","Mode","Purpose","Received By"],body=filtered.map(r=>[r.date,r.name,r.amount,r.mode,r.purpose,r.receivedBy].map(esc).join(","));const blob=new Blob([head.map(esc).join(",")+"\\n"+body.join("\\n")],{type:"text/csv"}),a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="maa-laxmi-puja-collection-2026.csv";a.click();URL.revokeObjectURL(a.href)}
+ function csv(){const esc=(x:any)=>JSON.stringify(String(x??"")),head=["Date","Contributor","Amount","Mode","Purpose","Received By"],body=filtered.map(r=>[r.date,r.name,r.amount,r.mode,r.purpose,r.receivedBy].map(esc).join(","));const blob=new Blob([head.map(esc).join(",")+"\n"+body.join("\n")],{type:"text/csv"}),a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="maa-laxmi-puja-collection-2026.csv";a.click();URL.revokeObjectURL(a.href)}
  function clearFilters(){setDateFrom("");setDateTo("");setModeFilter("All");setPurposeFilter("All");setQ("")}
  async function share(){const data={title:"Maa Laxmi Puja Collection 2026",text:"View the Maa Laxmi Puja Committee collection record.",url:location.href};try{if(navigator.share)await navigator.share(data);else{await navigator.clipboard.writeText(location.href);setShared(true);setTimeout(()=>setShared(false),1800)}}catch{}}
  return <main>
