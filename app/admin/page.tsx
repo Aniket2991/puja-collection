@@ -23,7 +23,6 @@ export default function Admin(){
  const reportType=(p:string)=>reportRecords.filter(r=>(r.purpose||"Other")===p).reduce((a,r)=>a+Number(r.amount),0);
  function reportCsv(){const esc=(x:any)=>JSON.stringify(String(x??"")),head=["Date","Contributor","Mobile","Amount","Mode","UTR","Collection Type","Received By","Notes"],body=reportRecords.map(r=>[r.date,r.name,r.mobile,r.amount,r.mode,r.utr,r.purpose,r.receivedBy,r.notes].map(esc).join(","));const blob=new Blob([head.map(esc).join(",")+"\\n"+body.join("\\n")],{type:"text/csv"}),a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="maa-laxmi-puja-report-"+reportMonth+".csv";a.click();URL.revokeObjectURL(a.href)}
  function printReport(){window.print()}
- const[adminQ,setAdminQ]=useState(""),[adminFrom,setAdminFrom]=useState(""),[adminTo,setAdminTo]=useState(""),[adminMode,setAdminMode]=useState("All"),[adminType,setAdminType]=useState("All");
  const adminFiltered=records.filter(r=>{
   const q=adminQ.toLowerCase().trim();
   const text=[r.name,r.mobile,r.utr,r.receivedBy,r.purpose,r.notes].join(" ").toLowerCase();
