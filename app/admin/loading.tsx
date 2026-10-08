@@ -1,0 +1,1 @@
+export default function Loading(){return <main className="adminPage"><div className="adminCard"><h1>Admin Dashboard</h1><p>Loading secure area…</p></div></main>}
