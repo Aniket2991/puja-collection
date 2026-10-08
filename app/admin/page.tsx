@@ -2,9 +2,10 @@
 import {useEffect,useState} from "react";
 type Rec={id:string,name:string,mobile:string,amount:string|number,mode:"UPI"|"Cash"|"Bank",utr:string,date:string,receivedBy:string,purpose:string,notes:string};
 type Audit={id:string,recordId:string,action:string,createdAt:string};
-(n:number)=>new Intl.NumberFormat("en-IN",{style:"currency",currency:"INR",maximumFractionDigits:2}).format(n);
+const indiaDate=()=>new Intl.DateTimeFormat("en-CA",{timeZone:"Asia/Kolkata",year:"numeric",month:"2-digit",day:"2-digit"}).format(new Date());
+const indiaMonth=()=>indiaDate().slice(0,7);
+const money=(n:number)=>new Intl.NumberFormat("en-IN",{style:"currency",currency:"INR",maximumFractionDigits:2}).format(n);
 const empty={name:"",mobile:"",amount:"",mode:"UPI",utr:"",date:indiaDate(),receivedBy:"",purpose:"Donation",notes:""};
-const indiaDate=()=>new Intl.DateTimeFormat("en-CA",{timeZone:"Asia/Kolkata",year:"numeric",month:"2-digit",day:"2-digit"}).format(new Date());\nconst indiaMonth=()=>indiaDate().slice(0,7);
 export default function Admin(){
  const[auth,setAuth]=useState<boolean|null>(null),[password,setPassword]=useState(""),[records,setRecords]=useState<Rec[]>([]),[audit,setAudit]=useState<Audit[]>([]),[loading,setLoading]=useState(true),[busy,setBusy]=useState(false),[message,setMessage]=useState(""),[form,setForm]=useState<any>(empty),[editing,setEditing]=useState<string|null>(null),[reportMonth,setReportMonth]=useState(indiaMonth()),[adminQ,setAdminQ]=useState(""),[adminFrom,setAdminFrom]=useState(""),[adminTo,setAdminTo]=useState(""),[adminMode,setAdminMode]=useState("All"),[adminType,setAdminType]=useState("All");
  async function load(){setLoading(true);try{const [a,b]=await Promise.all([fetch("/api/records",{cache:"no-store"}),fetch("/api/audit",{cache:"no-store"})]);if(a.ok)setRecords(await a.json());if(b.ok)setAudit(await b.json())}finally{setLoading(false)}}
