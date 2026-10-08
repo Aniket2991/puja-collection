@@ -17,8 +17,6 @@ export default function Admin(){
  async function remove(id:string){if(!window.confirm("Delete this collection record? This action cannot be undone."))return;setBusy(true);const r=await fetch("/api/records/"+id,{method:"DELETE"});const x=await r.json().catch(()=>({}));setMessage(r.ok?"Record deleted.":x.error||"Unable to delete record.");await load();setBusy(false)}
  if(auth===null)return <main className="adminPage"><div className="adminCard"><h1>Admin Dashboard</h1><p>Checking secure session…</p></div></main>;
  if(!auth)return <main className="adminPage"><form className="adminCard" onSubmit={login}><div className="eyebrow">MAA LAXMI PUJA COMMITTEE</div><h1>Admin Dashboard</h1><p>Sign in to manage collection records.</p><input type="password" placeholder="Admin password" value={password} onChange={e=>setPassword(e.target.value)} autoComplete="current-password" required/><button className="primary" disabled={busy}>{busy?"Signing in…":"Sign in"}</button>{message&&<div className="error">{message}</div>}<a href="/">← Public collection</a></form></main>;
- const currentMonth=new Date().toISOString().slice(0,7);
- const[reportMonth,setReportMonth]=useState(currentMonth);
  const reportRecords=records.filter(r=>r.date.slice(0,7)===reportMonth);
  const reportTotal=reportRecords.reduce((a,r)=>a+Number(r.amount),0);
  const reportBy=(m:string)=>reportRecords.filter(r=>r.mode===m).reduce((a,r)=>a+Number(r.amount),0);
