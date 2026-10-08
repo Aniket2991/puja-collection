@@ -20,9 +20,7 @@ export default function Home(){
  const monthTotal=monthRecords.reduce((a,r)=>a+Number(r.amount),0);
  const monthBy=(m:string)=>monthRecords.filter(r=>r.mode===m).reduce((a,r)=>a+Number(r.amount),0);
  const monthByType=(p:string)=>monthRecords.filter(r=>(r.purpose||"Other")===p).reduce((a,r)=>a+Number(r.amount),0);
- function csv(){const esc=(x:any)=>JSON.stringify(String(x??"")),head=["Date","Contributor","Amount","Mode","Purpose","Received By"],body=filtered.map(r=>[r.date,r.name,r.amount,r.mode,r.purpose,r.receivedBy].map(esc).join(","));const blob=new Blob([head.map(esc).join(",")+"
-"+body.join("
-")],{type:"text/csv"}),a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="maa-laxmi-puja-collection-2026.csv";a.click();URL.revokeObjectURL(a.href)}
+ function csv(){const esc=(x:any)=>JSON.stringify(String(x??"")),head=["Date","Contributor","Amount","Mode","Purpose","Received By"],body=filtered.map(r=>[r.date,r.name,r.amount,r.mode,r.purpose,r.receivedBy].map(esc).join(","));const blob=new Blob([head.map(esc).join(",")+"\\n"+body.join("\\n")],{type:"text/csv"}),a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="maa-laxmi-puja-collection-2026.csv";a.click();URL.revokeObjectURL(a.href)}
  function clearFilters(){setDateFrom("");setDateTo("");setModeFilter("All");setPurposeFilter("All");setQ("")}
  async function share(){const data={title:"Maa Laxmi Puja Collection 2026",text:"View the Maa Laxmi Puja Committee collection record.",url:location.href};try{if(navigator.share)await navigator.share(data);else{await navigator.clipboard.writeText(location.href);setShared(true);setTimeout(()=>setShared(false),1800)}}catch{}}
  return <main>
