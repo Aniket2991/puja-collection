@@ -46,3 +46,31 @@ footer small{font-size:10px}
 @media(max-width:900px){.siteNav{flex-wrap:wrap;padding:14px 20px 8px;gap:12px}.navLinks{order:3;width:100%;justify-content:center;border-top:1px solid #eadfd6;padding-top:7px}.siteNav .headerActions{margin-left:auto}.pageIntro{align-items:flex-start!important;flex-wrap:wrap}.statusBadge{margin-top:5px}}
 @media(max-width:650px){.siteNav{padding:12px 15px 8px;gap:10px}.brandLamp{width:37px;height:37px}.brandMark b{font-size:12px}.brandMark small{font-size:8px}.navLinks{justify-content:space-between;gap:3px}.navLinks a{flex:1;text-align:center;padding:9px 6px;font-size:11px}.siteNav .headerActions{width:auto;gap:5px}.siteNav .headerActions button{padding:8px 10px;font-size:11px}.pageIntro{padding:18px 15px 15px!important;gap:10px}.statusBadge{font-size:9px}.heroCopy p{font-size:13px}.notice{line-height:1.65}}
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
+
+/* Final admin and data-table usability polish */
+.adminPage>header{max-width:none;padding:8px 0 20px;border-bottom:1px solid #e7d8cc}
+.adminPage>header h1{font-size:clamp(28px,4vw,38px)}
+.adminPage .adminCardWide{border:1px solid #e7d9cf;border-radius:20px;background:rgba(255,255,255,.97);box-shadow:0 10px 30px rgba(67,40,22,.055);padding:24px}
+.adminPage .sectionHead{margin-bottom:14px}
+.adminPage .sectionHead h2{margin:4px 0 0;font-size:22px;letter-spacing:-.025em}
+.adminPage .sectionHead p{font-size:12px;color:#81736a;margin:6px 0 0}
+.adminPage .adminForm{gap:13px}
+.adminPage .adminForm input,.adminPage .adminForm select,.adminPage .adminForm textarea,.adminPage .adminFilters input,.adminPage .adminFilters select{min-height:46px;border-color:#e0d3c9;transition:border-color .15s,box-shadow .15s}
+.adminPage .adminForm input:focus,.adminPage .adminForm select:focus,.adminPage .adminForm textarea:focus,.adminPage .adminFilters input:focus,.adminPage .adminFilters select:focus{outline:none;border-color:#b44720;box-shadow:0 0 0 3px #b4472014}
+.adminPage .primary{min-height:46px;background:linear-gradient(135deg,#8f3217,#a94220);box-shadow:0 7px 18px #8f32171c;transition:transform .15s,box-shadow .15s}
+.adminPage .primary:hover{transform:translateY(-1px);box-shadow:0 10px 22px #8f321729}
+.adminPage .primary:disabled{opacity:.6;cursor:wait;transform:none}
+.adminPage .tableWrap{border-radius:13px;border-color:#eee5de}
+.adminPage table th{background:#faf6f2}
+.adminPage table td{vertical-align:middle}
+.adminPage table tbody tr:last-child td{border-bottom:0}
+.adminPage .empty{border-radius:12px;background:#fcfaf8;padding:25px 15px;font-size:13px}
+.adminPage .error{line-height:1.55}
+.adminPage .reportStats .stat b{font-size:clamp(15px,1.5vw,20px);overflow-wrap:anywhere}
+.adminPage .reportCard .sectionHead label{display:flex;align-items:center;gap:8px;font-size:11px;font-weight:800;color:#6c5a50}
+.adminPage .reportCard .sectionHead input{padding:9px 10px;border:1px solid #e0d3c9;border-radius:10px;background:#fff}
+.adminPage .reportActions button{min-height:43px}
+.adminPage .auditRow{background:#fff}
+.adminPage .auditRow span{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px}
+@media(max-width:700px){.adminPage{padding:14px}.adminPage .adminCardWide{padding:17px;margin-top:16px;border-radius:16px}.adminPage .sectionHead{align-items:center}.adminPage .sectionHead h2{font-size:19px}.adminPage .reportCard .sectionHead{align-items:flex-start;flex-wrap:wrap}.adminPage .reportStats{gap:8px}.adminPage .reportMix div{padding:12px}.adminPage .reportActions button{flex:1}.adminPage .adminFilters{gap:9px}}
+@media(prefers-reduced-motion:reduce){.adminPage .primary{transition:none}}
