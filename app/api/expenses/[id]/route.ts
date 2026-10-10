@@ -8,12 +8,12 @@ export async function PATCH(req:Request,{params}:{params:Promise<{id:string}>}){
  if(!(await isAuthenticated()))return NextResponse.json({error:"Unauthorized"},{status:401});
  const {id}=await params,x=await req.json().catch(()=>null),title=String(x?.title||"").trim(),category=String(x?.category||"Other").trim(),amount=x?.amount===""||x?.amount==null?0:Number(x?.amount),date=String(x?.date||"").trim(),paidBy=String(x?.paidBy||"").trim(),notes=String(x?.notes||"").trim();
  if(!title||!Number.isFinite(amount)||amount<=0||!validDate(date))return NextResponse.json({error:"Please enter an expense title, an amount greater than zero, and a valid date."},{status:400});
- await ensureSchema();const r=await db().unsafe("UPDATE collection_expenses SET title=$1,category=$2,amount=$3,date=$4,paid_by=$5,notes=$6,updated_at=NOW() WHERE id=$7 RETURNING id",[title,category,amount,date,paidBy,notes,id]);
+ await ensureSchema();const r=await db().unsafe("WITH changed AS (UPDATE collection_expenses SET title=$1,category=$2,amount=$3,date=$4,paid_by=$5,notes=$6,updated_at=NOW() WHERE id=$7 RETURNING id), logged AS (INSERT INTO expense_audit (id,expense_id,action) SELECT $8,id,'UPDATE' FROM changed RETURNING id) SELECT id FROM changed",[title,category,amount,date,paidBy,notes,id,crypto.randomUUID()]);
  if(!r.length)return NextResponse.json({error:"Expense not found."},{status:404});return NextResponse.json({ok:true});
 }
 export async function DELETE(req:Request,{params}:{params:Promise<{id:string}>}){
  if(!sameOrigin(req))return NextResponse.json({error:"Invalid request origin."},{status:403});
  if(!(await isAuthenticated()))return NextResponse.json({error:"Unauthorized"},{status:401});
- const {id}=await params;await ensureSchema();const r=await db().unsafe("DELETE FROM collection_expenses WHERE id=$1 RETURNING id",[id]);
+ const {id}=await params;await ensureSchema();const r=await db().unsafe("WITH removed AS (DELETE FROM collection_expenses WHERE id=$1 RETURNING id), logged AS (INSERT INTO expense_audit (id,expense_id,action) SELECT $2,id,'DELETE' FROM removed RETURNING id) SELECT id FROM removed",[id,crypto.randomUUID()]);
  if(!r.length)return NextResponse.json({error:"Expense not found."},{status:404});return NextResponse.json({ok:true});
 }
