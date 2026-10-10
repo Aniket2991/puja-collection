@@ -16,6 +16,6 @@ export async function POST(req:Request){
  const x=await req.json().catch(()=>null),title=String(x?.title||"").trim(),category=String(x?.category||"Other").trim(),amount=x?.amount===""||x?.amount==null?0:Number(x?.amount),date=String(x?.date||indiaDate()).trim(),paidBy=String(x?.paidBy||"").trim(),notes=String(x?.notes||"").trim();
  if(!title||!Number.isFinite(amount)||amount<=0||!validDate(date))return NextResponse.json({error:"Please enter an expense title, an amount greater than zero, and a valid date."},{status:400});
  await ensureSchema();const id=crypto.randomUUID();
- await db().unsafe("INSERT INTO collection_expenses (id,title,category,amount,date,paid_by,notes) VALUES ($1,$2,$3,$4,$5,$6,$7)",[id,title,category,amount,date,paidBy,notes]);
+ await db().unsafe("WITH created AS (INSERT INTO collection_expenses (id,title,category,amount,date,paid_by,notes) VALUES ($1,$2,$3,$4,$5,$6,$7) RETURNING id), logged AS (INSERT INTO expense_audit (id,expense_id,action) SELECT $8,id,'CREATE' FROM created RETURNING id) SELECT id FROM created",[id,title,category,amount,date,paidBy,notes,crypto.randomUUID()]);
  return NextResponse.json({id},{status:201});
 }
