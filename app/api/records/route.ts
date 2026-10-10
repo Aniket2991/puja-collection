@@ -1,6 +1,6 @@
 import {NextResponse} from "next/server";import {db,ensureSchema} from "../../../lib/db";import {isAuthenticated} from "../../../lib/auth";
 const audit=async(recordId:string,action:"CREATE"|"UPDATE"|"DELETE")=>{await db().unsafe("INSERT INTO collection_audit (id,record_id,action) VALUES ($1,$2,$3)",[crypto.randomUUID(),recordId,action])};
-function sameOrigin(req:Request){const origin=req.headers.get("origin");if(!origin)return true;try{return new URL(origin).host===new URL(req.url).host}catch{return false}}
+function validDate(value:string){if(!/^\\d{4}-\\d{2}-\\d{2}$/.test(value))return false;const d=new Date(value+"T00:00:00Z");return Number.isFinite(d.getTime())&&d.toISOString().slice(0,10)===value}\nfunction sameOrigin(req:Request){const origin=req.headers.get("origin");if(!origin)return true;try{return new URL(origin).host===new URL(req.url).host}catch{return false}}
 export async function GET(req:Request){
   await ensureSchema();
   const admin=await isAuthenticated(),s=db(),q=new URL(req.url).searchParams.get("q")?.trim()||"",p="%"+q+"%";
@@ -21,7 +21,7 @@ export async function POST(req:Request){
   if(!sameOrigin(req))return NextResponse.json({error:"Invalid request origin."},{status:403});
   if(!(await isAuthenticated()))return NextResponse.json({error:"Unauthorized"},{status:401});
   const x=await req.json().catch(()=>null),name=String(x?.name||"").trim(),mobile=String(x?.mobile||"").trim(),mode=String(x?.mode||"UPI"),utr=String(x?.utr||"").trim(),date=String(x?.date||new Intl.DateTimeFormat("en-CA",{timeZone:"Asia/Kolkata"}).format(new Date())).trim(),receivedBy=String(x?.receivedBy||"").trim(),purpose=String(x?.purpose||"Donation").trim(),notes=String(x?.notes||"").trim(),amount=x?.amount===""||x?.amount==null?0:Number(x?.amount);
-  if(!Number.isFinite(amount)||amount<0||!["UPI","Cash","Bank"].includes(mode)||!/^\d{4}-\d{2}-\d{2}$/.test(date))return NextResponse.json({error:"Please enter valid values."},{status:400});
+  if(!Number.isFinite(amount)||amount<0||!["UPI","Cash","Bank"].includes(mode)||!/^\d{4}-\d{2}-\d{2}$/.test(date))return NextResponse.json({error:"Enter a contributor name, an amount greater than zero, a valid date, and a supported payment mode."},{status:400});
   await ensureSchema();
   const id=crypto.randomUUID();
   try{
