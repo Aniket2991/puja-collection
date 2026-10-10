@@ -21,7 +21,7 @@ export async function POST(req:Request){
   if(!sameOrigin(req))return NextResponse.json({error:"Invalid request origin."},{status:403});
   if(!(await isAuthenticated()))return NextResponse.json({error:"Unauthorized"},{status:401});
   const x=await req.json().catch(()=>null),name=String(x?.name||"").trim(),mobile=String(x?.mobile||"").trim(),mode=String(x?.mode||"UPI"),utr=String(x?.utr||"").trim(),date=String(x?.date||new Intl.DateTimeFormat("en-CA",{timeZone:"Asia/Kolkata"}).format(new Date())).trim(),receivedBy=String(x?.receivedBy||"").trim(),purpose=String(x?.purpose||"Donation").trim(),notes=String(x?.notes||"").trim(),amount=x?.amount===""||x?.amount==null?0:Number(x?.amount);
-  if(!Number.isFinite(amount)||amount<0||!["UPI","Cash","Bank"].includes(mode)||!/^d{4}-d{2}-d{2}$/.test(date))return NextResponse.json({error:"Please enter valid values."},{status:400});
+  if(!Number.isFinite(amount)||amount<0||!["UPI","Cash","Bank"].includes(mode)||!/^\d{4}-\d{2}-\d{2}$/.test(date))return NextResponse.json({error:"Please enter valid values."},{status:400});
   await ensureSchema();
   const id=crypto.randomUUID();
   try{
