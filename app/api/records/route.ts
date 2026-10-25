@@ -1,4 +1,4 @@
-import {NextResponse} from "next/server";import {db} from "../../../lib/db";import {isAuthenticated} from "../../../lib/auth";
+import {NextResponse} from "next/server";import {db,ensureSchema} from "../../../lib/db";import {isAuthenticated} from "../../../lib/auth";
 const audit=async(recordId:string,action:"CREATE"|"UPDATE"|"DELETE")=>{await db().unsafe("INSERT INTO collection_audit (id,record_id,action) VALUES ($1,$2,$3)",[crypto.randomUUID(),recordId,action])};
 function validDate(value:string){if(!/^\d{4}-\d{2}-\d{2}$/.test(value))return false;const d=new Date(value+"T00:00:00Z");return Number.isFinite(d.getTime())&&d.toISOString().slice(0,10)===value}
 function sameOrigin(req:Request){const origin=req.headers.get("origin");if(!origin)return true;try{return new URL(origin).host===new URL(req.url).host}catch{return false}}
