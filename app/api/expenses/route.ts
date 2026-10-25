@@ -6,7 +6,7 @@ function validDate(value:string){if(!/^\d{4}-\d{2}-\d{2}$/.test(value))return fa
 const indiaDate=()=>new Intl.DateTimeFormat("en-CA",{timeZone:"Asia/Kolkata",year:"numeric",month:"2-digit",day:"2-digit"}).format(new Date());
 export async function GET(req:Request){
  if(!(await isAuthenticated()))return NextResponse.json({error:"Unauthorized"},{status:401});
- await ensureSchema(); const s=db(),q=new URL(req.url).searchParams.get("q")?.trim()||"",p="%"+q+"%";
+ const s=db(),q=new URL(req.url).searchParams.get("q")?.trim()||"",p="%"+q+"%";
  const rows=q?await s.unsafe("SELECT id,title,category,amount::text,date::text,paid_by AS \"paidBy\",notes FROM collection_expenses WHERE title ILIKE $1 OR category ILIKE $1 OR paid_by ILIKE $1 OR notes ILIKE $1 ORDER BY date DESC,created_at DESC",[p]):await s.unsafe("SELECT id,title,category,amount::text,date::text,paid_by AS \"paidBy\",notes FROM collection_expenses ORDER BY date DESC,created_at DESC");
  return NextResponse.json(rows,{headers:{"Cache-Control":"private, no-store, max-age=0"}});
 }
