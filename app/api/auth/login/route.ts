@@ -1,4 +1,5 @@
-import {NextResponse} from "next/server";import {setSession,validPassword} from "../../../../lib/auth";
+import {NextResponse} from "next/server";
+import {setSession,validPassword} from "../../../../lib/auth";
 
 type Attempt={count:number,reset:number};
 const attempts=new Map<string,Attempt>();
@@ -10,7 +11,14 @@ function clientKey(req:Request){
   return forwarded||req.headers.get("x-real-ip")||"unknown";
 }
 
+function sameOrigin(req:Request){
+  const origin=req.headers.get("origin");
+  if(!origin)return false;
+  try{return new URL(origin).host===new URL(req.url).host}catch{return false}
+}
+
 export async function POST(req:Request){
+  if(!sameOrigin(req))return NextResponse.json({error:"Invalid request origin."},{status:403});
   const key=clientKey(req),now=Date.now(),current=attempts.get(key);
   if(current&&current.reset>now&&current.count>=LIMIT)return NextResponse.json({error:"Too many login attempts. Please try again later."},{status:429});
   if(current&&current.reset<=now)attempts.delete(key);
@@ -23,5 +31,5 @@ export async function POST(req:Request){
   }
   attempts.delete(key);
   await setSession();
-  return NextResponse.json({ok:true});
+  return NextResponse.json({ok:true},{headers:{"Cache-Control":"no-store"}});
 }
